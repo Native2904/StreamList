@@ -1,133 +1,148 @@
 # StreamList
 
-**Versteckte NTFS-Datenströme in Total Commander sehen, bearbeiten und aufräumen**
+**View, edit and clean up hidden NTFS data streams in Total Commander**
 
-Version 0.7.1 · Dateisystem-Plugin (WFX) für 32 und 64 Bit · Autor: Native2904 · Lizenz: MIT
+Version 1.2.1 · File system plugin (WFX) for 32 and 64 bit · Author: Native2904 · License: MIT
 
-Die Kapitel bauen aufeinander auf: von den Grundlagen alternativer Datenströme über die Arbeit mit einzelnen Dateien bis zur laufwerksweiten Auswertung mit Everything. Wer StreamList bereits kennt, findet Tastenbelegung, Felder sowie Einstellungen und Protokoll in den Kapiteln 5, 10 und 12 gesammelt.
+The chapters build on each other: from the basics of alternate data streams, through working with individual files, to drive-wide analysis with Everything. If you already know StreamList, you will find the key assignments, fields, and settings and protocol collected in chapters 5, 10 and 12.
 
 ---
 
-## 1. Was ist ein Datenstrom?
+## 1. What is a data stream?
 
-NTFS speichert den Inhalt einer Datei in einem Datenstrom. Neben diesem Hauptdatenstrom kann eine Datei beliebig viele weitere, benannte Datenströme besitzen – **alternative Datenströme** (*Alternate Data Streams*, kurz ADS), im Folgenden einfach **Streams**. Der Explorer zeigt sie nicht an, und die angezeigte Dateigröße berücksichtigt sie nicht. Beim Kopieren oder Verschieben innerhalb von NTFS bleiben sie dennoch mit der Datei verbunden.
+NTFS stores the content of a file in a data stream. Besides this main data stream, a file can have any number of additional, named data streams – **alternate data streams** (ADS), simply called **streams** below. Explorer does not show them, and the displayed file size does not include them. When a file is copied or moved within NTFS, its streams nevertheless stay with it.
 
-Am häufigsten begegnet man ihnen in Form der Download-Kennzeichnung, oft *Mark of the Web* genannt: Browser legen an jede heruntergeladene Datei einen Stream `Zone.Identifier` an. Er vermerkt die Sicherheitszone, aus der die Datei stammt, und meist auch die Herkunftsadresse. Auf ihm beruht der Hinweis, den Windows beim Öffnen solcher Dateien anzeigt.
+They are most commonly encountered as the download mark, often called *Mark of the Web*: browsers attach a stream `Zone.Identifier` to every downloaded file. It records the security zone the file came from and usually its source address. The warning Windows shows when opening such files is based on it.
 
-Sichtbar machen lässt sich das in der Eingabeaufforderung mit `dir /r`:
+This can be made visible at the command prompt with `dir /r`:
 
-| Größe | Name |
+| Size | Name |
 |---:|---|
-| 4.858.880 | `alrext.exe` |
+| 4,858,880 | `alrext.exe` |
 | 52 | `alrext.exe:Zone.Identifier:$DATA` |
-| 87.552 | `ChmLib.dll` |
+| 87,552 | `ChmLib.dll` |
 | 52 | `ChmLib.dll:Zone.Identifier:$DATA` |
 
-Die Zeilen in der Form `Datei:Name:$DATA` sind Streams; `alrext.exe` besitzt demnach einen 52 Byte großen Stream `Zone.Identifier`.
+Lines of the form `file:name:$DATA` are streams; `alrext.exe` therefore has a 52-byte stream `Zone.Identifier`.
 
-StreamList stellt diese Streams in Total Commander als gewöhnliche Einträge dar, die sich ansehen, bearbeiten, anlegen und löschen lassen.
+StreamList presents these streams in Total Commander as ordinary entries that can be viewed, edited, created and deleted.
 
 ---
 
 ## 2. Installation
 
-Voraussetzungen sind Total Commander ab Version 7.5, Windows 7 oder neuer und **Everything 1.5** von voidtools mit indizierten Stream-Eigenschaften (Einrichtung in Kapitel 8). Das Archiv wird in Total Commander geöffnet und die Installation bestätigt; StreamList erscheint anschließend in der **Netzwerkumgebung**.
+Requirements are Total Commander 7.5 or later, Windows 7 or later, and **Everything 1.5** by voidtools with indexed stream properties (set-up in chapter 8). Open the archive in Total Commander and confirm the installation; StreamList then appears in the **Network Neighborhood**.
 
-Die Kapitel 3 bis 7 beschreiben die Arbeit mit einzelnen Ordnern und Dateien, Kapitel 8 die laufwerksweite Auswertung über Everything.
+Chapters 3 to 7 describe working with individual folders and files, chapter 8 the drive-wide analysis via Everything.
 
 ---
 
-## 3. Erster Überblick
+## 3. First overview
 
-Der Eintrag **StreamList** in der Netzwerkumgebung zeigt die NTFS-Laufwerke des Systems und zwei Listen mit Lupensymbol:
+The entry **StreamList** in the Network Neighborhood shows the system's NTFS drives and two lists with a magnifier icon:
 
 | Name | Streams |
 |---|---:|
-| 🔍 `! Alle Dateien mit Streams` | |
+| 🔍 `! Free search` | |
+| 🔍 `! All files with streams` | |
 | 🔍 `! Downloads (Zone.Identifier)` | |
-| 📁 `C` | ∑ 58.448 |
+| 📁 `C` | ∑ 58,448 |
 | 📁 `D` | ∑ 312 |
 
-Die Listen behandelt Kapitel 8. Zunächst geht es um die Darstellung gewöhnlicher Ordner.
+The lists are covered in chapter 8. First, the display of ordinary folders.
 
 ---
 
-## 4. Die Ordneransicht
+## 4. The folder view
 
-Innerhalb von StreamList entspricht ein Ordner der gewohnten Darstellung, und auch die Dateioperationen verhalten sich wie im normalen Panel: F5 kopiert, F6 verschiebt, F8 löscht die echten Dateien (Kapitel 6). Eine Abweichung gibt es: **Enter auf einer Datei öffnet nicht die Datei, sondern ihre Streams.**
+Within StreamList, a folder looks as usual, and file operations behave as in a normal panel: F5 copies, F6 moves, F8 deletes the real files (chapter 6). There is one difference: **Enter on a file does not open the file, but its streams.**
 
-Welche Dateien überhaupt Streams besitzen, zeigt die Spaltenansicht, die StreamList beim Betreten mitbringt:
+Which files have streams at all is shown by the column view StreamList brings along when entered:
 
-| Name | Größe | Streams | Inhalt | Herkunft |
+| Name | Size | Streams | Content | Origin |
 |---|---:|---:|---|---|
 | 📁 `Tools` | `<DIR>` | ∑ 31 | | |
-| 📦 `setup.zip` | 2.418.330 | 1 | Zone.Identifier | https://example.org/… |
-| 📄 `notiz.txt` | 1.204 | 2 | Comment, eins | |
-| 📄 `bild.png` | 88.112 | | | |
+| 📦 `setup.zip` | 2,418,330 | 1 | Zone.Identifier | https://example.org/… |
+| 📄 `note.txt` | 1,204 | 2 | Comment, one | |
+| 📄 `image.png` | 88,112 | | | |
 
-- **Streams** gibt bei Dateien die Anzahl ihrer Streams an. Bei Ordnern steht dort, mit `∑` gekennzeichnet, die Zahl der Dateien mit Streams im gesamten Teilbaum; sie stammt aus dem Everything-Index (Kapitel 8).
-- **Inhalt** nennt die Namen der Streams.
-- **Herkunft** enthält bei heruntergeladenen Dateien die Quelladresse aus dem `Zone.Identifier`.
+- **Streams** gives the number of streams for files. For folders, marked with `∑`, it shows the number of files with streams in the whole subtree; this value comes from the Everything index (chapter 8).
+- **Content** lists the names of the streams.
+- **Origin** contains the source address from the `Zone.Identifier` for downloaded files.
 
-Leere Felder, wie bei `bild.png`, bedeuten, dass keine Streams vorhanden sind.
+Empty fields, as with `image.png`, mean that there are no streams.
+
+If the **folder itself** has streams, an additional entry `[Streams]` appears at the top. Chapter 5 explains it.
 
 ---
 
-## 5. Die Stream-Ansicht einer Datei
+## 5. The stream view of a file
 
-Enter auf `notiz.txt` wechselt in die Stream-Ansicht dieser Datei:
+Enter on `note.txt` switches to the stream view of this file:
 
-| Name | Größe | Inhalt |
+| Name | Size | Content |
 |---|---:|---|
-| 📄 `Comment.txt` | 7 | Rechnung |
-| 📄 `eins.txt` | 16 | erster Stream |
+| 📄 `Comment.txt` | 7 | Invoice |
+| 📄 `one.txt` | 16 | first stream |
 
-Die Spalte **Inhalt** enthält hier die erste Textzeile des jeweiligen Streams; binäre Streams werden als Hexadezimalfolge wiedergegeben, etwa `4D 5A 90 00 …`.
+Here the **Content** column holds the first text line of each stream; binary streams are shown as a hexadecimal sequence, e.g. `4D 5A 90 00 …`.
 
-Die Endung `.txt` ist geliehen: Die Streams heißen tatsächlich `Comment` und `eins`. StreamList ergänzt sie bei Text-Streams ohne eigene Endung, damit sie sich nach dem Herauskopieren mit den üblichen Programmen öffnen lassen. Beim Bearbeiten, Löschen und Umbenennen arbeitet StreamList stets mit dem echten Namen. Streams mit Endung (etwa `Zone.Identifier`) und binäre Streams behalten ihren Namen; mit `TxtExtension=0` lässt sich das Verhalten abschalten.
+The `.txt` extension is borrowed: the streams are actually called `Comment` and `one`. StreamList adds it to text streams without an extension of their own so that they can be opened with the usual programs after copying them out. When editing, deleting and renaming, StreamList always works with the real name. Streams with an extension (such as `Zone.Identifier`) and binary streams keep their names; `TxtExtension=0` switches this behaviour off.
 
-Bedient wird die Stream-Ansicht mit den üblichen Funktionstasten:
+The stream view is operated with the usual function keys:
 
-| Taste | Wirkung |
+| Key | Effect |
 |---|---|
-| F3 | Stream ansehen |
-| F4 | Stream bearbeiten – beim Speichern wird er in die Datei zurückgeschrieben |
-| F5 | Streams herauskopieren; sie werden zu normalen Dateien |
-| F5 aus dem anderen Panel | normale Dateien hineinkopieren; sie werden zu Streams |
-| F7 | neuen, leeren Stream anlegen |
-| Umsch+F6 | Stream umbenennen |
-| F6 | Streams herausverschieben |
-| F8 | Streams löschen |
-| Alt+Enter | Infos zum Stream |
+| F3 | view a stream |
+| F4 | edit a stream – saving writes it back into the file |
+| F5 | copy streams out; they become normal files |
+| F5 from the other panel | copy normal files in; they become streams |
+| F7 | create a new, empty stream |
+| Shift+F6 | rename a stream |
+| F6 | move streams out |
+| F8 | delete streams |
+| Alt+Enter | information about the stream |
 
-Die Rücktaste führt zurück in den Ordner. Welche Schutzregeln dabei gelten, beschreibt das folgende Kapitel.
+Backspace returns to the folder. The protective rules that apply are described in the next chapter.
+
+### Streams on folders
+
+Not only files, folders too can carry streams. They are even less conspicuous than those of files and are therefore occasionally used as a hiding place. Since Enter on a folder leads into the folder, StreamList shows them via an entry of their own:
+
+| Name | Streams |
+|---|---:|
+| 📁 `[Streams]` | 2 |
+| 📁 `Subfolder` | ∑ 5 |
+| 📄 `note.txt` | 1 |
+
+`[Streams]` only appears if the opened folder itself has streams, and leads to an ordinary stream view with all function keys. Two more ways lead there: the command `em_StreamListFolder` (chapter 7) for the selected folder, and Alt+Enter on a folder with streams, which offers the choice of showing its streams or its properties.
 
 ---
 
-## 6. Schutzregeln
+## 6. Protective rules
 
-StreamList unterscheidet zwei Ebenen, und die Funktionstasten wirken jeweils nur auf die Ebene, die man gerade sieht:
+StreamList distinguishes two levels, and the function keys always act only on the level currently displayed:
 
-| Ebene | F5 / F6 / F8 / Umsch+F6 wirken auf … |
+| Level | F5 / F6 / F8 / Shift+F6 act on … |
 |---|---|
-| Übersicht: Ordneransicht, Dateilisten (Kapitel 8) | die echten Dateien und Ordner |
-| Stream-Ansicht einer Datei, Streamlisten (Kapitel 8) | die Streams |
+| Overview: folder view, file lists (chapter 8) | the real files and folders |
+| Stream view of a file, stream lists (chapter 8) | the streams |
 
-Daraus ergeben sich folgende Grundsätze:
+This results in the following principles:
 
-- **Gelöschte Dateien und Ordner landen im Papierkorb.** In Dateisystem-Plugins wäre Löschen sonst endgültig; der Papierkorb macht einen Fehlgriff rückgängig. Laufwerke selbst werden nie gelöscht oder umbenannt.
-- **Kopieren nimmt die Streams mit.** Eine kopierte Datei behält auf NTFS-Zielen ihre Streams.
-- **Streams werden nur dort gelöscht, wo sie ausdrücklich als Streams aufgeführt sind.** Ein F8 auf eine Datei entfernt die Datei – nie nur einzelne ihrer Streams; umgekehrt kann ein F8 in der Stream-Ansicht nie die Datei selbst treffen.
-- **Zeitstempel bleiben erhalten.** Schreibzugriffe auf einen Stream ändern unter NTFS das Änderungsdatum der Datei; StreamList stellt es anschließend wieder her.
-- **Schreibgeschützte Dateien** bleiben unverändert; StreamList nennt den Grund.
+- **Deleted files and folders go to the Recycle Bin.** In file system plugins deleting would otherwise be final; the Recycle Bin makes a slip reversible. Drives themselves are never deleted or renamed.
+- **Copying takes the streams along.** A copied file keeps its streams on NTFS targets.
+- **Streams are only deleted where they are explicitly listed as streams.** F8 on a file removes the file – never just some of its streams; conversely, F8 in the stream view can never hit the file itself.
+- **Time stamps are preserved.** Writing to a stream changes the file's modification date on NTFS; StreamList restores it afterwards.
+- **Read-only files** stay unchanged; StreamList states the reason.
 
-Wer StreamList als reines Werkzeug für Streams nutzen möchte, schaltet die Dateioperationen mit `FileOperations=0` ab. Dann verändert StreamList ausschließlich Streams und weist bei Dateioperationen in der Übersicht auf diese Einstellung hin.
+Anyone who wants to use StreamList purely as a tool for streams switches the file operations off with `FileOperations=0`. StreamList then changes streams only and points to this setting when file operations are attempted in the overview.
 
 ---
 
-## 7. Direkteinstieg per Befehl
+## 7. Direct access by command
 
-Für den täglichen Gebrauch ist der Weg über die Netzwerkumgebung umständlich. Zwei benutzerdefinierte Befehle in der `usercmd.ini` (neben der `wincmd.ini`) führen direkt an die gewünschte Stelle:
+For everyday use, the way via the Network Neighborhood is cumbersome. Four user-defined commands in `usercmd.ini` (next to `wincmd.ini`) lead straight to the desired place:
 
 ```ini
 [em_StreamList]
@@ -137,215 +152,230 @@ param=\\\StreamList\%P%N
 [em_StreamListDir]
 cmd=cd
 param=\\\StreamList\%P
+
+[em_StreamListFolder]
+cmd=cd
+param=\\\StreamList\%P%N\[Streams]
+
+[em_StreamListSearch]
+cmd=cd
+param=\\\StreamList\!find
 ```
 
-Unter *Konfiguration → Einstellungen → Diverses* lassen sich ihnen Tastenkürzel zuweisen; ebenso können sie auf Buttons gelegt werden.
+Hotkeys can be assigned under *Configuration → Options → Misc.*; the commands can also be placed on buttons.
 
-| Befehl | ausgelöst im normalen Panel auf … | Ziel |
+| Command | triggered in a normal panel on … | Target |
 |---|---|---|
-| `em_StreamList` | einer Datei | Stream-Ansicht dieser Datei |
-| `em_StreamListDir` | beliebiger Stelle | aktueller Ordner in der Darstellung von StreamList |
+| `em_StreamList` | a file | stream view of this file |
+| `em_StreamListDir` | any position | current folder as displayed by StreamList |
+| `em_StreamListFolder` | a folder | streams of this folder (chapter 5) |
+| `em_StreamListSearch` | any position | free search (chapter 9) |
 
-Gedacht sind beide Befehle für das normale Panel; innerhalb von StreamList genügt Enter.
+The commands are meant for the normal panel; inside StreamList, Enter is sufficient.
+
+Total Commander replaces placeholders such as `%P` and `%N` only in the **Parameter** field of a command or button, not in the **Command** field. If everything is entered there, the path arrives unchanged; StreamList detects this and points it out.
 
 ---
 
-## 8. Laufwerksweite Auswertung mit Everything
+## 8. Drive-wide analysis with Everything
 
-**Everything 1.5** von voidtools führt einen Index über alle Dateien eines Systems und kann ihn auch nach Streams durchsuchen. StreamList nutzt diesen Index für die ∑-Summen und für laufwerksweite Listen, die in wenigen Sekunden vorliegen. Das Lesen, Schreiben und Löschen der Streams selbst übernimmt StreamList unmittelbar auf dem Datenträger.
+**Everything 1.5** by voidtools keeps an index of all files on a system and can also search it for streams. StreamList uses this index for the ∑ totals and for drive-wide lists that are available within a few seconds. Reading, writing and deleting the streams themselves is done by StreamList directly on the drive.
 
-### Einmalige Vorbereitung
+### One-time preparation
 
-Damit Everything Streams durchsuchen kann, müssen zwei Eigenschaften indiziert werden (in Everything sinngemäß unter *Extras → Optionen → Indizes → Eigenschaften*):
+For Everything to search streams, two properties must be indexed (in Everything roughly under *Tools → Options → Indexes → Properties*):
 
-- **Namen alternativer Datenströme**
-- **Anzahl alternativer Datenströme**
+- **Alternate Data Stream Names**
+- **Alternate Data Stream Count**
 
-Der erste Indexlauf nimmt einige Zeit in Anspruch; danach hält Everything den Index selbständig aktuell. Fehlen die Eigenschaften, weist StreamList darauf hin, statt eine Suche zu beginnen, die ohne Index mehrere Minuten dauern würde.
+The first indexing run takes some time; afterwards Everything keeps the index up to date by itself. If the properties are missing, StreamList points this out instead of starting a search that would take several minutes without an index.
 
-### Summen je Ordner
+### Totals per folder
 
-Die in Kapitel 4 erwähnten `∑`-Werte zeigen, wo sich Streams konzentrieren:
+The `∑` values mentioned in chapter 4 show where streams are concentrated:
 
 | Name | Streams |
 |---|---:|
-| 📁 `Users` | ∑ 32.192 |
-| 📁 `mingw64` | ∑ 23.044 |
+| 📁 `Users` | ∑ 32,192 |
+| 📁 `mingw64` | ∑ 23,044 |
 | 📁 `tcmd` | ∑ 961 |
 | 📁 `Windows` | ∑ 46 |
 | 📁 `Program Files` | |
 
-Hohe Werte bei entpackten Programmen wie `mingw64` sind typisch: Windows überträgt die Download-Kennzeichnung eines ZIP-Archivs beim Entpacken auf jede enthaltene Datei.
+High values for unpacked programs such as `mingw64` are typical: when unpacking, Windows transfers the download mark of a ZIP archive to every file it contains.
 
-### Listen im Hauptverzeichnis
+### Lists in the root folder
 
-Die beiden Listen aus Kapitel 3 stellen die Treffer einer Everything-Suche über alle Laufwerke als flache Liste dar.
+The two lists from chapter 3 show the results of an Everything search across all drives as a flat list.
 
-**`! Alle Dateien mit Streams`** enthält jede Datei mit mindestens einem Stream; Enter öffnet ihre Stream-Ansicht. Da die Einträge echte Dateien sind, lassen sie sich wie in jeder Suchergebnisliste kopieren, verschieben oder löschen.
+**`! All files with streams`** contains every file with at least one stream; Enter opens its stream view. Since the entries are real files, they can be copied, moved or deleted as in any search result list.
 
-**`! Downloads (Zone.Identifier)`** ist anders aufgebaut: Jeder Eintrag steht hier unmittelbar für den `Zone.Identifier` einer Datei.
+**`! Downloads (Zone.Identifier)`** is built differently: each entry here stands directly for the `Zone.Identifier` of a file.
 
-| Name | Inhalt | Ordner |
+| Name | Content | Folder |
 |---|---|---|
 | 📄 `__init__.py` | …\winlibs.zip | C:\mingw64\lib\python3.9\asyncio |
 | 📄 `__init__ [2].py` | …\winlibs.zip | C:\mingw64\lib\python3.9\collections |
 | 📦 `setup.zip` | https://example.org/… | C:\Users\…\Downloads |
 
-Die Spalte **Ordner** gibt den Speicherort an; gleichnamige Dateien aus verschiedenen Ordnern werden durch einen Zusatz wie `[2]` unterschieden.
+The **Folder** column gives the location; files with the same name from different folders are distinguished by a suffix such as `[2]`.
 
-### Download-Kennzeichnungen entfernen
+### Removing download marks
 
-Da jeder Eintrag dieser Liste ein Stream ist, wirken die Funktionstasten unmittelbar: F3 zeigt die Kennzeichnung an, **F8 entfernt sie** – auch für eine große Zahl markierter Einträge in einem Durchgang, mit der üblichen Rückfrage und Fortschrittsanzeige von Total Commander.
+Since every entry of this list is a stream, the function keys act directly: F3 shows the mark, **F8 removes it** – even for a large number of selected entries in one go, with Total Commander's usual confirmation and progress display.
 
-Die Auswirkung im Einzelnen:
+The effect in detail:
 
-| | vorher | nachher |
+| | before | after |
 |---|---|---|
-| Datei | `alrext.exe` | `alrext.exe` – unverändert, gleiches Datum |
-| Stream | `alrext.exe:Zone.Identifier` | entfernt |
-| Windows | warnt beim Öffnen | warnt nicht mehr |
+| File | `alrext.exe` | `alrext.exe` – unchanged, same date |
+| Stream | `alrext.exe:Zone.Identifier` | removed |
+| Windows | warns when opening | no longer warns |
 
-Die Kennzeichnung erfüllt eine Schutzfunktion. Bei vertrauenswürdigen, selbst entpackten Programmen ist sie entbehrlich; bei Dateien unklarer Herkunft empfiehlt es sich, sie zu belassen.
+The mark serves a protective purpose. For trusted programs you unpacked yourself it is dispensable; for files of unclear origin it is advisable to leave it in place.
 
 ---
 
-## 9. Eigene Listen
+## 9. Own lists
 
-Die beiden Listen sind Voreinstellungen. In der `StreamList.ini` neben dem Plugin lassen sich bis zu zwanzig eigene Suchen definieren, jeweils bestehend aus einem Namen, einem Everything-Suchausdruck und optional einem Streamnamen:
+The two lists are defaults. Up to twenty searches of your own can be defined in `StreamList.ini` next to the plugin, each consisting of a name, an Everything search expression and optionally a stream name:
 
 ```ini
 [Search1]
-Name=! Kommentare (ntfs_diz)
+Name=! Comments (ntfs_diz)
 Query=alternate-data-stream-names:comment
 Stream=Comment
 ```
 
-Der Eintrag `Stream=` bestimmt die Art der Liste:
+The entry `Stream=` determines the type of list:
 
-| `Stream=` | Art der Liste | Ein Eintrag ist … | Enter / F8 |
+| `Stream=` | Type of list | An entry is … | Enter / F8 |
 |---|---|---|---|
-| leer | Dateiliste | eine Datei | Enter öffnet ihre Streams, F8 ist gesperrt |
-| gesetzt | Streamliste | genau dieser Stream der Datei | F3/F4/F8 wirken direkt auf den Stream |
+| empty | file list | a file | Enter opens its streams; F5/F6/F8 act on the file |
+| set | stream list | exactly this stream of the file | F3/F4/F8 act directly on the stream |
 
-Sobald ein Abschnitt `[Search1]` vorhanden ist, treten die eigenen Listen an die Stelle der Voreinstellungen.
+As soon as a section `[Search1]` exists, your own lists replace the defaults.
+
+### Free search
+
+For changing search terms – such as tag streams like `MyTag` – the root folder contains the entry **"! Free search"**. When entered, it shows the results of the last search used. At the top is the entry **"! New search…"**: Enter or a double-click on it asks for any Everything search; the last ten searches are offered for selection. The results appear as a file list: F5, F6 and F8 act on the files, Enter opens their streams, and the *Preview* column shows the content of the streams. The results stay until the next new search. The command `em_StreamListSearch` (chapter 7) leads directly to the list.
 
 ---
 
-## 10. Eigene Spaltenansichten
+## 10. Own column views
 
-Für eigene Spaltenansichten stellt StreamList folgende Felder bereit:
+For your own column views, StreamList provides the following fields:
 
-| Feld | zeigt … |
+| Field | shows … |
 |---|---|
-| `StreamCount` | Anzahl der Streams, bei Ordnern die ∑-Summe |
-| `StreamNames` | Namen der Streams einer Datei |
-| `Content` | je nach Ebene das Nützlichste: Namen, erste Zeile oder Herkunft |
-| `Origin` | Download-Adresse (HostUrl) |
-| `Referrer` | verweisende Seite oder Archiv (ReferrerUrl) |
-| `Zone` | Internet, Intranet, Lokal … |
-| `Preview` | erste Textzeile eines Streams |
-| `Kind` | Text, Binär, Zoneninfo, Leer – oder **Programm (EXE/DLL)**, wenn ein Stream ausführbaren Code enthält. Das ist ein bekanntes Versteck für Schadsoftware und verdient einen genaueren Blick. |
-| `Folder` | Ordner einer Datei in den Everything-Listen |
-| `Size` | Größe der Datei bzw. des Streams; ersetzt in der Standardansicht die Größenspalte von Total Commander |
-| `StreamsTotal` | Summe der Größen aller Streams einer Datei |
-| `AllocatedSize` | tatsächlich belegter Platz eines Streams bzw. aller Streams einer Datei |
-| `EntryModified` | letzte Änderung des NTFS-Eintrags – ändert sich auch dann, wenn das Änderungsdatum der Datei erhalten bleibt |
-| `FullStreamName` | vollständiger Name in der Form `C:\…\datei.txt:Comment` |
+| `StreamCount` | number of streams; for folders their own streams and the ∑ total of their content, e.g. `1 · ∑ 5` |
+| `StreamNames` | names of the streams of a file |
+| `Content` | the most useful value for each level: names, first line or origin |
+| `Origin` | download address (HostUrl) |
+| `Referrer` | referring page or archive (ReferrerUrl) |
+| `Zone` | Internet, Intranet, Local … |
+| `Preview` | first text line of a stream; for files and folders the content of their streams in short form (without Zone.Identifier) – e.g. for tag streams such as `MyTag` |
+| `Kind` | Text, Binary, Zone info, Empty – or **Program (EXE/DLL)** if a stream contains executable code. This is a well-known hiding place for malware and deserves a closer look. |
+| `Folder` | folder of a file in the Everything lists |
+| `Size` | size of the file or stream; replaces Total Commander's size column in the default view |
+| `StreamsTotal` | total size of all streams of a file, or of a folder's own streams |
+| `AllocatedSize` | space actually occupied by a stream or by all streams of a file or folder |
+| `EntryModified` | last change of the NTFS entry – changes even when the file's modification date is preserved |
+| `FullStreamName` | full name in the form `C:\…\file.txt:Comment` |
 
-In der Ordneransicht stehen außerdem die Felder anderer **Inhalts-Plugins** zur Verfügung, etwa von ntfs_diz oder xytags, da StreamList Total Commander zu jedem Eintrag die zugrunde liegende Datei mitteilt.
+In the folder view, the fields of other **content plugins** are available as well, e.g. from ntfs_diz or xytags, since StreamList tells Total Commander the underlying file of each entry.
 
-Hinweis für Nutzer früherer Versionen: Total Commander übernimmt die Standardansicht eines Plugins nur einmal. Wer die neue Größenspalte (ab 0.5.0) sehen möchte oder noch das alte Anzahl-Feld `Streams` (vor 0.4.1) verwendet, löscht die gespeicherte Ansicht; beim nächsten Betreten legt StreamList sie neu an.
-
----
-
-## 11. Zusammenarbeit mit ntfs_diz
-
-ntfs_diz legt Dateikommentare als Streams ab, jedes Kommentarfeld in einem eigenen Stream mit dem Feldnamen (`Comment`, `Comment1` usw.). In StreamList erscheinen diese Kommentare daher als gewöhnliche Streams, die sich mit F3 lesen und mit F4 bearbeiten lassen. Beide Plugins können parallel eingesetzt werden.
+Note for users of a test version: Total Commander adopts a plugin's default view only once. If columns stay empty, delete the stored view; StreamList creates it anew the next time it is entered.
 
 ---
 
-## 12. Einstellungen und Protokoll
+## 11. Working with ntfs_diz
 
-Die Einstellungen lassen sich bequem über einen Dialog ändern: **Rechtsklick auf StreamList in der Netzwerkumgebung → Eigenschaften.** Er zeigt außerdem, ob Everything erreichbar ist und ob die beiden Stream-Eigenschaften indiziert sind – die häufigste Ursache, wenn die Listen leer bleiben. Eigene Listen (Kapitel 9) lassen sich dort anlegen, bearbeiten und mit „Testen“ sofort ausprobieren.
+ntfs_diz stores file comments as streams, each comment field in a stream of its own named after the field (`Comment`, `Comment1` etc.). In StreamList these comments therefore appear as ordinary streams that can be read with F3 and edited with F4. Both plugins can be used side by side.
 
-Das **?** in der Titelleiste oder **F1** öffnet diese Anleitung in der eingestellten Sprache, direkt beim Kapitel zum gerade gewählten Bedienelement.
+---
 
-Nach OK liest StreamList alles neu ein; sichtbar werden die Änderungen beim nächsten Einlesen einer Liste (Strg+R oder Ordnerwechsel). Ein Neustart von Total Commander ist nicht nötig.
+## 12. Settings and protocol
 
-**Protokoll.** StreamList hält jede Dateioperation mit Datum, Uhrzeit, Aktion, Quelle, Ziel und Ergebnis in der Datei `StreamList_operations.txt` neben dem Plugin fest. Die Schaltfläche „Protokoll anzeigen…“ im Dialog öffnet sie als sortierbare, filterbare Liste:
+The settings can be changed conveniently in a dialog: **right-click StreamList in the Network Neighborhood → Properties.** It also shows whether Everything is reachable and whether the two stream properties are indexed – the most common cause when the lists stay empty. Own lists (chapter 9) can be created, edited and tried out immediately with "Test" there.
 
-| Zeit | Aktion | Quelle | Ergebnis |
+The **?** in the title bar or **F1** opens this manual in the selected language, directly at the chapter for the control currently selected. For this purpose the manual is supplied as Windows help `StreamList_eng.chm` next to the plugin; StreamList removes a download mark from this file itself when opening it, otherwise its pages would stay blank.
+
+After OK, StreamList reloads everything; the changes become visible the next time a list is read (Ctrl+R or changing folders). Restarting Total Commander is not necessary.
+
+**Protocol.** StreamList records every file operation with date, time, action, source, target and result in the file `StreamList_operations.txt` next to the plugin. The button "Show protocol…" in the dialog opens it as a sortable, filterable list:
+
+| Time | Action | Source | Result |
 |---|---|---|---|
-| 2026-10-05 14:03:12 | Stream gelöscht | `C:\…\setup.zip:Zone.Identifier` | OK |
-| 2026-10-05 14:05:40 | In den Papierkorb | `C:\Temp\alt.txt` | OK |
-| 2026-10-05 14:06:02 | Stream geschrieben | `C:\ADSTest\aa.txt:MyTag` | OK |
+| 2026-10-05 14:03:12 | Stream deleted | `C:\…\setup.zip:Zone.Identifier` | OK |
+| 2026-10-05 14:05:40 | Moved to Recycle Bin | `C:\Temp\old.txt` | OK |
+| 2026-10-05 14:06:02 | Stream written | `C:\ADSTest\aa.txt:MyTag` | OK |
 
-Das bloße Ansehen (F3) und das Zwischenspeichern beim Bearbeiten (F4) werden nicht festgehalten, wohl aber das Zurückschreiben. Die Datei ist tabulatorgetrennter Text und lässt sich auch im Lister oder in einer Tabellenkalkulation öffnen.
+Merely viewing (F3) and the temporary copy when editing (F4) are not recorded, but writing back is. The file is tab-separated text and can also be opened in Lister or in a spreadsheet.
 
-Dialog und Datei sind gleichwertig: Sämtliche Einstellungen stehen in der `StreamList.ini` neben dem Plugin und können auch von Hand geändert werden. Beim ersten Speichern aus dem Dialog wird die Datei in UTF-16 umgewandelt, damit auch Listennamen in nicht-lateinischer Schrift erhalten bleiben.
+Dialog and file are equivalent: all settings are stored in `StreamList.ini` next to the plugin and can also be changed by hand. When saving from the dialog for the first time, the file is converted to UTF-16 so that list names in non-Latin scripts are preserved.
 
-| Abschnitt | Eintrag | Bedeutung |
+| Section | Entry | Meaning |
 |---|---|---|
-| `[Options]` | `KeepTime=1` | Datum der Datei beim Ändern von Streams erhalten |
-| | `TxtExtension=1` | Text-Streams ohne Endung als `.txt` anzeigen (Kapitel 5) |
-| | `FileOperations=1` | Dateioperationen auf echte Dateien in der Übersicht (Kapitel 6) |
-| `[Protocol]` | `Enabled=1` | Dateioperationen protokollieren |
-| | `MaxLines=10000` | höchstens so viele Einträge; ältere fallen weg |
-| `[Settings]` | `Language=auto` | Sprache von Total Commander, sonst `eng`, `deu`, `rus`, `ukr`, `dan` |
-| `[Everything]` | `Timeout=30000` | so lange (ms) höchstens auf Everything warten |
-| | `MaxResults=100000` | höchstens so viele Einträge pro Liste |
-| | `Exclude=!\$Recycle.Bin\` | an jede Suche angehängt; blendet den Papierkorb aus |
-| | `FolderQuery=…` | was für die ∑-Summen gezählt wird; leer schaltet sie ab |
-| | `FolderCacheMinutes=5` | so lange werden die Summen wiederverwendet |
-| `[Search1]` … `[Search20]` | | eigene Listen (Kapitel 9) |
+| `[Options]` | `KeepTime=1` | keep the file's date when changing streams |
+| | `TxtExtension=1` | show text streams without extension as `.txt` (chapter 5) |
+| | `FileOperations=1` | file operations on real files in the overview (chapter 6) |
+| `[Protocol]` | `Enabled=1` | record file operations |
+| | `MaxLines=10000` | at most this many entries; older ones are dropped |
+| `[Settings]` | `Language=auto` | language of Total Commander, otherwise `eng`, `deu`, `rus`, `ukr`, `dan` |
+| `[Everything]` | `Timeout=30000` | wait at most this long (ms) for Everything |
+| | `MaxResults=100000` | at most this many entries per list |
+| | `Exclude=!\$Recycle.Bin\` | appended to every search; hides the Recycle Bin |
+| | `FolderQuery=…` | what is counted for the ∑ totals; empty switches them off |
+| | `FolderCacheMinutes=5` | how long the totals are reused |
+| `[Search1]` … `[Search20]` | | own lists (chapter 9) |
 
-Zu `FolderQuery`: Synchronisationsdienste wie Dropbox versehen jede Datei mit einem eigenen Stream und dominieren dann die Summen. Mit `FolderQuery=alternate-data-stream-names:zone.identifier` beschränken sich die Summen auf Download-Kennzeichnungen.
-
----
-
-## 13. Hinweise und Grenzen
-
-- Streams gehen verloren, sobald eine Datei auf FAT32 oder exFAT kopiert, per E-Mail versandt oder bei vielen Cloud-Diensten hochgeladen wird.
-- Ob Total Commander Streams beim Kopieren mitnimmt, regelt die Option `CopyStreams` (siehe Hilfe von Total Commander).
-- Netz- und CD-Laufwerke werden im Hauptverzeichnis nicht aufgeführt, sind aber über `em_StreamListDir` erreichbar.
-- Streams, die an Ordnern selbst hängen, werden derzeit nicht angezeigt.
-- Größen und Zeitstempel in Spalten werden als Text geliefert, weil Total Commander Zahlenwerte bei Ordnerzeilen sonst nicht zuverlässig anzeigt. Größen sind deshalb rechtsbündig aufgefüllt und Zeitstempel im Format `JJJJ-MM-TT hh:mm:ss` geschrieben; so stimmt auch die Sortierung.
-- Die ∑-Summen stammen aus dem Everything-Index, die Werte einzelner Dateien liest StreamList direkt vom Datenträger. Unmittelbar nach Änderungen können beide kurzzeitig voneinander abweichen.
-- Ist Everything nicht gestartet, bleiben die ∑-Summen leer und die Listen zeigen einen Hinweis. StreamList versucht es nach etwa 30 Sekunden erneut; ein Neustart von Total Commander ist nicht nötig.
+About `FolderQuery`: synchronisation services such as Dropbox give every file a stream of their own and then dominate the totals. With `FolderQuery=alternate-data-stream-names:zone.identifier` the totals are limited to download marks.
 
 ---
 
-## 14. Fehlersuche
+## 13. Notes and limits
 
-Zur Fehlersuche steht eine **Debug-Version** bereit. Sie protokolliert in die Datei `StreamList_debug.log` neben dem Plugin; die erste Zeile weist aus, welche Plugin- und welche Einstellungsdatei Total Commander tatsächlich lädt:
+- Streams are lost as soon as a file is copied to FAT32 or exFAT, sent by e-mail or uploaded to many cloud services.
+- Whether Total Commander takes streams along when copying is controlled by the option `CopyStreams` (see Total Commander's help).
+- Network and CD drives are not listed in the root folder, but can be reached via `em_StreamListDir`.
+- Sizes and time stamps in columns are delivered as text, because Total Commander otherwise does not reliably display numeric values in folder rows. Sizes are therefore right-padded and time stamps written as `YYYY-MM-DD hh:mm:ss`; this also keeps sorting correct.
+- The ∑ totals come from the Everything index, the values of individual files are read by StreamList directly from the drive. Immediately after changes, both may briefly differ.
+- If Everything is not running, the ∑ totals stay empty and the lists show a note. StreamList tries again after about 30 seconds; restarting Total Commander is not necessary.
+
+---
+
+## 14. Troubleshooting
+
+A **debug version** is available for troubleshooting. It logs to the file `StreamList_debug.log` next to the plugin; the first line shows which plugin and which settings file Total Commander actually loads:
 
 ```text
 === DEBUG-Build geladen: C:\…\StreamList.wfx64 | INI: C:\…\StreamList.ini (vorhanden) | Log=1 ===
 ```
 
-Fehlerberichte mit diesem Protokoll und einer kurzen Beschreibung sind über das Total-Commander-Forum oder GitHub willkommen. Die reguläre Version enthält keinen Protokollierungscode.
+Bug reports with this log and a short description are welcome via the Total Commander forum or GitHub. The regular version contains no logging code.
 
 ---
 
-## 15. Übersetzungen
+## 15. Translations
 
-`StreamList.lng` enthält Englisch, Deutsch, Russisch, Ukrainisch und Dänisch. Beiträge in weiteren Sprachen nimmt der Autor gern über das Total-Commander-Forum oder GitHub entgegen.
+`StreamList.lng` contains English, German, Russian, Ukrainian and Danish. Contributions in further languages are gladly accepted via the Total Commander forum or GitHub.
 
 ---
 
-## 16. Versionen
+## 16. Versions
 
-| Version | Änderungen |
+| Version | Changes |
 |---|---|
-| 0.7.1 | Hilfe per F1 oder ? direkt beim passenden Kapitel |
-| 0.7.0 | Einstellungsdialog mit Everything-Status und Listen-Editor; Protokoll aller Dateioperationen |
-| 0.6.0 | Übersicht mit normalen Dateioperationen (Löschen über den Papierkorb, abschaltbar); Enter führt in die Streams; ausführbare Streams werden als Programm gekennzeichnet |
-| 0.5.1 | Text-Streams ohne Endung erscheinen als `.txt` (abschaltbar) |
-| 0.5.0 | neue Felder Size, StreamsTotal, AllocatedSize, EntryModified und FullStreamName; korrekte Stream-Größen auch in Streamlisten |
-| 0.4.4 | Everything 1.5 als Voraussetzung; nicht mehr benötigter Code entfernt; schnellerer Neuversuch, wenn Everything später startet |
-| 0.4.3 | Debug- und Release-Version getrennt; Debug-Version meldet geladene Dateien |
-| 0.4.0 | ∑-Summen für Ordner und Laufwerke; Feld `StreamCount` |
-| 0.3.0 | Everything-Listen für die ganze Platte; Streamlisten mit direktem F3/F4/F8; Spalte Ordner |
-| 0.2.0 | eigene Spalten und Standardansicht; Inhalts-Plugins anderer Autoren; Symbol |
-| 0.1.1 | Hotkey funktioniert auch innerhalb des Plugins |
-| 0.1.0 | erste Version: Streams auflisten, ansehen, bearbeiten, anlegen, umbenennen, löschen |
+| 1.2.1 | Help as CHM in all five languages: F1 and ? reliably jump to the matching chapter, with contents and search |
+| 1.2.0 | Free search: a new search is only started via the entry "! New search…" – the input dialog no longer opens unintentionally, e.g. when moving the mouse over it |
+| 1.1.2 | Folders also show their own streams in StreamCount, StreamsTotal and AllocatedSize |
+| 1.1.1 | Alt+Enter on a folder with streams: "Show streams" now reliably opens the stream view |
+| 1.1.0 | Free search: any Everything search as a file list, with history |
+| 1.0.1 | Column Preview shows the content of the streams of files and folders in the overview |
+| 1.0.0 | First official version: stream view for files and folders, Everything lists and ∑ totals, file operations in the overview, borrowed `.txt` extension, columns comparable to AlternateStreamView, settings dialog with help, protocol |
+| 0.1 – 0.7 | Preview versions for testers in the Total Commander forum |
+
+---
+
+<p class="signoff"><em>Made with love – and with <a href="https://somafm.com">SomaFM</a> playing in the background. ♥</em></p>
